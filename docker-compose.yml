@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  mysql:
+    image: mysql
+
+    ports:
+      - "3306:3306"
+
+    expose:
+      - "3306"
+
+    volumes:
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./mysql/init_db.d:/docker-entrypoint-initdb.d
+
+    environment:
+      MYSQL_USER: crawler
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: crawler
+
+  crawler:
+    image: node:7.4
+    command: tail -f /dev/null
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: crawler
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: crawler
+    volumes:
+      - ./crawler:/app
+    links:
+      - mysql
